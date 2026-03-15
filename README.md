@@ -17,3 +17,5 @@ Simple deployment on static hosting platforms
 🛠️ Technologies Used
 
 HTML5 – Website structure
+CSS 
+Javasript
