@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACEFASH Shopping Cart — Review your items and proceed to secure Razorpay checkout.">
     <title>ACEFASH | Shopping Cart</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div class="notice-bar">
-        <marquee behavior="scroll" direction="left" scrollamount="4">This is a production-ready website. The products displayed are not actual — In the future, we will commercialize and sell genuine products!</marquee>
+        <marquee behavior="scroll" direction="left" scrollamount="4">🔥 FREE SHIPPING ON ORDERS ABOVE Rs.999 &nbsp;|&nbsp; ✅ 15-Day Easy Returns &nbsp;|&nbsp; 🔒 100% Secure Checkout via Razorpay</marquee>
     </div>
-    <div class="navbar">
+    <div class="navbar" id="main-navbar">
         <div class="logo"><a href="index.html"><img src="logo.png" alt="ACEFASH"></a></div>
         <nav>
             <ul>
@@ -22,7 +23,7 @@
                 <li><a href="account.html" id="account-link">ACCOUNT</a></li>
             </ul>
         </nav>
-        <a href="cart.html" class="cart-icon"><img src="cart.png" alt="Cart"><span id="cart-count" style="display:none;">0</span></a>
+        <a href="cart.html" class="cart-icon active"><img src="cart.png" alt="Cart"><span id="cart-count" style="display:none;">0</span></a>
     </div>
 
     <div class="small-container">
@@ -49,7 +50,9 @@
                 </table>
             </div>
             <div class="checkout-btn-wrapper" id="checkout-wrapper">
-                <a href="#" class="btn" id="checkout-btn">Proceed to Checkout &#8594;</a>
+                <a href="checkout.html" class="btn" id="checkout-btn">
+                    <i class="fa fa-lock"></i> Proceed to Secure Checkout &#8594;
+                </a>
             </div>
         </div>
     </div>
@@ -57,7 +60,7 @@
     <div class="footer">
         <div class="row">
             <div class="footer-col"><img src="logo.png" alt="ACEFASH"><p>Our Purpose Is To Sustainably Make the Pleasure and Benefits of Fashion Accessible to Many.</p></div>
-            <div class="footer-col"><h3>Quick Links</h3><ul><li><a href="index.html">Home</a></li><li><a href="products.html">Products</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+            <div class="footer-col"><h3>Quick Links</h3><ul><li><a href="index.html"><i class="fa fa-angle-right"></i> Home</a></li><li><a href="products.html"><i class="fa fa-angle-right"></i> Products</a></li><li><a href="contact.html"><i class="fa fa-angle-right"></i> Contact</a></li></ul></div>
             <div class="footer-col"><h3>Follow Us</h3><ul><li><a href="https://www.linkedin.com/in/aditya-sharma55/" target="_blank"><i class="fa fa-linkedin"></i> LinkedIn</a></li><li><a href="https://www.instagram.com/aditya_sharma2909?igsh=bHJsaTQ3cTZ0M3dy" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li><li><a href="https://www.facebook.com/share/1CKezvCDQY/" target="_blank"><i class="fa fa-facebook"></i> Facebook</a></li></ul></div>
         </div>
         <div class="footer-bottom"><p>&copy; 2026 ACEFASH. All Rights Reserved.</p></div>

@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACEFASH All Products — Shop T-Shirts, Shoes, Watches, Trackpants and more at best prices.">
     <title>ACEFASH | All Products</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div class="notice-bar">
-        <marquee behavior="scroll" direction="left" scrollamount="4">This is a production-ready website. The products displayed are not actual — In the future, we will commercialize and sell genuine products!</marquee>
+        <marquee behavior="scroll" direction="left" scrollamount="4">🔥 FREE SHIPPING ON ORDERS ABOVE Rs.999 &nbsp;|&nbsp; 🎁 USE CODE ACEFASH10 FOR 10% OFF &nbsp;|&nbsp; ✅ 15-Day Easy Returns</marquee>
     </div>
-    <div class="navbar">
+    <div class="navbar" id="main-navbar">
         <div class="logo"><a href="index.html"><img src="logo.png" alt="ACEFASH"></a></div>
         <nav>
             <ul>
@@ -26,7 +27,7 @@
     </div>
 
     <div class="small-container">
-        <div class="products-header">
+        <div class="products-header reveal">
             <h2>All Products</h2>
             <select id="sort-select">
                 <option value="default">Default Sorting</option>
@@ -35,13 +36,18 @@
                 <option value="rating">Sort by Rating</option>
             </select>
         </div>
-        <div class="products-row" id="all-products"></div>
+        <div class="products-row stagger-children" id="all-products">
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+        </div>
     </div>
 
     <div class="footer">
         <div class="row">
             <div class="footer-col"><img src="logo.png" alt="ACEFASH"><p>Our Purpose Is To Sustainably Make the Pleasure and Benefits of Fashion Accessible to Many.</p></div>
-            <div class="footer-col"><h3>Quick Links</h3><ul><li><a href="index.html">Home</a></li><li><a href="products.html">Products</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+            <div class="footer-col"><h3>Quick Links</h3><ul><li><a href="index.html"><i class="fa fa-angle-right"></i> Home</a></li><li><a href="products.html"><i class="fa fa-angle-right"></i> Products</a></li><li><a href="contact.html"><i class="fa fa-angle-right"></i> Contact</a></li></ul></div>
             <div class="footer-col"><h3>Follow Us</h3><ul><li><a href="https://www.linkedin.com/in/aditya-sharma55/" target="_blank"><i class="fa fa-linkedin"></i> LinkedIn</a></li><li><a href="https://www.instagram.com/aditya_sharma2909?igsh=bHJsaTQ3cTZ0M3dy" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li><li><a href="https://www.facebook.com/share/1CKezvCDQY/" target="_blank"><i class="fa fa-facebook"></i> Facebook</a></li></ul></div>
         </div>
         <div class="footer-bottom"><p>&copy; 2026 ACEFASH. All Rights Reserved.</p></div>

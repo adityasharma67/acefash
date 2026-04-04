@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACEFASH Secure Checkout — Pay safely with UPI, Credit/Debit Card, or Netbanking via Razorpay.">
+    <title>ACEFASH | Secure Checkout</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Razorpay Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <!-- NOTICE BAR -->
+    <div class="notice-bar">
+        <marquee behavior="scroll" direction="left" scrollamount="4">🔒 100% Secure Checkout powered by Razorpay &nbsp;|&nbsp; ✅ UPI · Cards · Netbanking · Wallets Supported &nbsp;|&nbsp; 🚀 Order ships within 24 hours</marquee>
+    </div>
+
+    <!-- NAVBAR -->
+    <div class="navbar" id="main-navbar">
+        <div class="logo"><a href="index.html"><img src="logo.png" alt="ACEFASH"></a></div>
+        <nav>
+            <ul>
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="products.html">PRODUCTS</a></li>
+                <li><a href="contact.html">CONTACT</a></li>
+                <li><a href="account.html" id="account-link">ACCOUNT</a></li>
+            </ul>
+        </nav>
+        <a href="cart.html" class="cart-icon"><img src="cart.png" alt="Cart"><span id="cart-count" style="display:none;">0</span></a>
+    </div>
+
+    <!-- CHECKOUT PAGE -->
+    <div class="checkout-page">
+        <div class="checkout-heading">
+            <h1>Secure Checkout</h1>
+            <p>Complete your order in seconds — safe &amp; encrypted</p>
+        </div>
+
+        <div class="checkout-grid" id="checkout-grid">
+
+            <!-- LEFT: Shipping + Payment -->
+            <div class="checkout-form-card">
+
+                <!-- Step 1: Shipping Address -->
+                <h2>
+                    <span class="step-badge">1</span>
+                    Shipping Address
+                </h2>
+
+                <form id="checkout-address-form" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first-name">First Name</label>
+                            <input type="text" id="first-name" placeholder="Aditya" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Last Name</label>
+                            <input type="text" id="last-name" placeholder="Sharma" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="checkout-email">Email</label>
+                            <input type="email" id="checkout-email" placeholder="you@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkout-phone">Phone</label>
+                            <input type="tel" id="checkout-phone" placeholder="98XXXXXXXX" maxlength="10" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address-line">Address</label>
+                        <input type="text" id="address-line" placeholder="House No., Street, Area" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" placeholder="Mumbai" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pincode">PIN Code</label>
+                            <input type="text" id="pincode" placeholder="400001" maxlength="6" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <select id="state" required>
+                            <option value="">Select State</option>
+                            <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
+                            <option>Chhattisgarh</option><option>Delhi</option><option>Goa</option>
+                            <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+                            <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+                            <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+                            <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
+                            <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+                            <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
+                            <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+                            <option>West Bengal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-divider"></div>
+
+                    <!-- Step 2: Payment -->
+                    <h2 style="margin-bottom: 20px;">
+                        <span class="step-badge">2</span>
+                        Payment Method
+                    </h2>
+
+                    <div class="payment-section">
+                        <div class="payment-note">
+                            <!-- Razorpay logo as inline SVG text -->
+                            <div class="rzp-icon" style="text-align:center; padding-top:4px;">
+                                <i class="fa fa-shield" style="font-size:32px; color:#072654;"></i>
+                            </div>
+                            <p>
+                                <strong>Powered by Razorpay</strong><br>
+                                All payment methods available — UPI, Credit/Debit Cards, Netbanking, Wallets &amp; EMI.
+                                Your payment is <strong>100% encrypted</strong> and secure.
+                            </p>
+                        </div>
+
+                        <div class="payment-methods">
+                            <div class="pay-method-pill active" id="pill-upi" onclick="selectPayMethod('upi')">
+                                <i class="fa fa-mobile"></i> UPI
+                            </div>
+                            <div class="pay-method-pill" id="pill-card" onclick="selectPayMethod('card')">
+                                <i class="fa fa-credit-card"></i> Card
+                            </div>
+                            <div class="pay-method-pill" id="pill-netbanking" onclick="selectPayMethod('netbanking')">
+                                <i class="fa fa-university"></i> Netbanking
+                            </div>
+                            <div class="pay-method-pill" id="pill-wallet" onclick="selectPayMethod('wallet')">
+                                <i class="fa fa-money"></i> Wallets
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="pay-now-btn" id="pay-now-btn">
+                        <span class="btn-text"><i class="fa fa-lock lock-icon"></i> Pay Now</span>
+                        <div class="pay-spinner"></div>
+                    </button>
+
+                    <div class="secure-badge">
+                        <i class="fa fa-lock"></i>
+                        <span>256-bit SSL Encrypted &amp; Secure Payment</span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- RIGHT: Order Summary -->
+            <div class="order-summary-card">
+                <h2>Order Summary</h2>
+                <div id="order-empty" class="empty-checkout-msg" style="display:none;">
+                    <i class="fa fa-shopping-bag"></i>
+                    <p>Your cart is empty.</p>
+                    <a href="products.html" class="btn" style="margin-top:16px;">Shop Now</a>
+                </div>
+                <ul class="order-items-list" id="order-items-list"></ul>
+                <div class="order-divider"></div>
+                <div class="order-totals" id="order-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span id="summary-subtotal">Rs. 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Shipping</span>
+                        <span id="summary-shipping" style="color:#27ae60; font-weight:600;">FREE</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Tax (10%)</span>
+                        <span id="summary-tax">Rs. 0.00</span>
+                    </div>
+                    <div class="total-row grand">
+                        <span>Total</span>
+                        <span id="summary-total">Rs. 0.00</span>
+                    </div>
+                </div>
+
+                <!-- Trust badges -->
+                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <div style="text-align:center; font-size:12px; color:#aaa;">
+                        <i class="fa fa-shield" style="font-size:22px; color:#27ae60; display:block; margin-bottom:4px;"></i>
+                        Secure
+                    </div>
+                    <div style="text-align:center; font-size:12px; color:#aaa;">
+                        <i class="fa fa-truck" style="font-size:22px; color:#3498db; display:block; margin-bottom:4px;"></i>
+                        Fast Ship
+                    </div>
+                    <div style="text-align:center; font-size:12px; color:#aaa;">
+                        <i class="fa fa-refresh" style="font-size:22px; color:#ff523b; display:block; margin-bottom:4px;"></i>
+                        15-Day Return
+                    </div>
+                    <div style="text-align:center; font-size:12px; color:#aaa;">
+                        <i class="fa fa-headphones" style="font-size:22px; color:#9b59b6; display:block; margin-bottom:4px;"></i>
+                        24/7 Support
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS OVERLAY -->
+    <div class="success-overlay" id="success-overlay">
+        <div class="success-card">
+            <div class="success-icon-wrap">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="46" class="success-circle"/>
+                    <polyline points="28,52 43,67 72,36" class="success-check"/>
+                </svg>
+            </div>
+            <h2>Order Placed! 🎉</h2>
+            <p>Thank you for shopping with <strong>ACEFASH</strong>!</p>
+            <p>Your items are being packed and will be shipped soon.</p>
+            <div class="success-id" id="success-payment-id">Payment ID: Generating...</div>
+            <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+                <a href="index.html" class="btn">Continue Shopping</a>
+                <a href="products.html" class="btn-outline">View All Products</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti container -->
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="row">
+            <div class="footer-col"><img src="logo.png" alt="ACEFASH"><p>Our Purpose Is To Sustainably Make the Pleasure and Benefits of Fashion Accessible to Many.</p></div>
+            <div class="footer-col"><h3>Quick Links</h3><ul><li><a href="index.html"><i class="fa fa-angle-right"></i> Home</a></li><li><a href="products.html"><i class="fa fa-angle-right"></i> Products</a></li><li><a href="cart.html"><i class="fa fa-angle-right"></i> Cart</a></li></ul></div>
+            <div class="footer-col"><h3>Follow Us</h3><ul><li><a href="https://www.linkedin.com/in/aditya-sharma55/" target="_blank"><i class="fa fa-linkedin"></i> LinkedIn</a></li><li><a href="https://www.instagram.com/aditya_sharma2909?igsh=bHJsaTQ3cTZ0M3dy" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li></ul></div>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2026 ACEFASH. All Rights Reserved.</p></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="assets/js/products.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/checkout.js"></script>
+</body>
+</html>

@@ -1,10 +1,16 @@
+// =====================================================
+// ACEFASH — Main JavaScript
+// Handles: Cart, Auth, Product Render, Scroll Reveal,
+//          Navbar Scroll Effect, Zoom, Contact
+// =====================================================
+
 // Quick little popup to tell the user what just happened
 function showToast(message) {
     const toast = document.getElementById('toast');
     if (!toast) return;
     toast.innerText = message;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
+    setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
 // Builds the star icons based on product rating (supports half stars too)
@@ -21,8 +27,8 @@ function getRatingHtml(rating) {
 // Creates a single product card that navigates to the detail page on click
 function createProductCard(product) {
     return `
-        <div class="product-card" onclick="window.location.href='product-details.html?id=${product.id}'">
-            <img src="${product.image}" alt="${product.name}">
+        <div class="product-card reveal" onclick="window.location.href='product-details.html?id=${product.id}'">
+            <img src="${product.image}" alt="${product.name}" loading="lazy">
             <div class="product-info">
                 <h4>${product.name}</h4>
                 <p>Rs. ${product.price.toFixed(2)}</p>
@@ -37,6 +43,8 @@ function renderProducts(list, containerId) {
     const el = document.getElementById(containerId);
     if (!el) return;
     el.innerHTML = list.map(p => createProductCard(p)).join('');
+    // Trigger reveal for newly injected cards
+    initScrollReveal();
 }
 
 // Pulls the saved cart from browser storage
@@ -61,6 +69,15 @@ function addToCart(productId, quantity, size) {
     }
     saveCart(cart);
     showToast('✓ Item added to cart!');
+
+    // Pop animation on badge
+    const badge = document.getElementById('cart-count');
+    if (badge) {
+        badge.classList.remove('pop');
+        void badge.offsetWidth; // reflow
+        badge.classList.add('pop');
+        setTimeout(() => badge.classList.remove('pop'), 400);
+    }
 }
 
 // Keeps the cart icon count badge in sync with actual cart contents
@@ -88,12 +105,16 @@ function renderCart() {
     let subtotal = 0;
 
     if (cart.length === 0) {
-        html = '<tr><td colspan="3" class="empty-cart-msg">Your cart is empty. <a href="products.html" style="color:#ff523b;">Continue Shopping</a></td></tr>';
-        document.getElementById('cart-totals').style.display = 'none';
-        document.getElementById('checkout-wrapper').style.display = 'none';
+        html = '<tr><td colspan="3" class="empty-cart-msg">Your cart is empty. <a href="products.html">Continue Shopping</a></td></tr>';
+        const totalsEl = document.getElementById('cart-totals');
+        const wrapperEl = document.getElementById('checkout-wrapper');
+        if (totalsEl) totalsEl.style.display = 'none';
+        if (wrapperEl) wrapperEl.style.display = 'none';
     } else {
-        document.getElementById('cart-totals').style.display = 'flex';
-        document.getElementById('checkout-wrapper').style.display = 'block';
+        const totalsEl = document.getElementById('cart-totals');
+        const wrapperEl = document.getElementById('checkout-wrapper');
+        if (totalsEl) totalsEl.style.display = 'flex';
+        if (wrapperEl) wrapperEl.style.display = 'block';
 
         cart.forEach((item, index) => {
             const product = window.products.find(p => p.id === item.productId);
@@ -109,12 +130,12 @@ function renderCart() {
                                     <p><b>${product.name}</b></p>
                                     <small>Price: Rs. ${product.price.toFixed(2)}</small><br>
                                     <small>Size: ${item.size || 'N/A'}</small><br>
-                                    <a href="#" onclick="removeFromCart(${index}); return false;">Remove</a>
+                                    <a href="#" onclick="removeFromCart(${index}); return false;"><i class="fa fa-trash"></i> Remove</a>
                                 </div>
                             </div>
                         </td>
                         <td><input type="number" value="${item.quantity}" min="1" onchange="updateCartQty(${index}, this.value)"></td>
-                        <td>Rs. ${itemTotal.toFixed(2)}</td>
+                        <td><b>Rs. ${itemTotal.toFixed(2)}</b></td>
                     </tr>
                 `;
             }
@@ -123,15 +144,14 @@ function renderCart() {
 
     container.innerHTML = html;
 
-    // 10% tax added on top of subtotal
     const tax = subtotal * 0.10;
     const total = subtotal + tax;
     const subtotalEl = document.getElementById('cart-subtotal');
-    const taxEl = document.getElementById('cart-tax');
-    const totalEl = document.getElementById('cart-total');
+    const taxEl      = document.getElementById('cart-tax');
+    const totalEl    = document.getElementById('cart-total');
     if (subtotalEl) subtotalEl.innerText = `Rs. ${subtotal.toFixed(2)}`;
-    if (taxEl) taxEl.innerText = `Rs. ${tax.toFixed(2)}`;
-    if (totalEl) totalEl.innerHTML = `<b>Rs. ${total.toFixed(2)}</b>`;
+    if (taxEl)      taxEl.innerText      = `Rs. ${tax.toFixed(2)}`;
+    if (totalEl)    totalEl.innerHTML    = `<b>Rs. ${total.toFixed(2)}</b>`;
 }
 
 // Removes an item from the cart by its position in the array
@@ -197,7 +217,6 @@ function logoutUser() {
 function setupAuth() {
     const currentUser = getCurrentUser();
 
-    // If someone's logged in, swap the ACCOUNT nav link to show their name + logout
     const accountLink = document.getElementById('account-link');
     if (accountLink && currentUser) {
         accountLink.innerText = `LOGOUT (${currentUser.username})`;
@@ -208,40 +227,37 @@ function setupAuth() {
         });
     }
 
-    // On the account page, replace the form with a welcome panel if already logged in
     const formContainer = document.getElementById('form-container');
     if (formContainer && currentUser) {
         formContainer.innerHTML = `
             <div class="logged-in-panel">
-                <h3>Welcome, ${currentUser.username}!</h3>
+                <h3>Welcome, ${currentUser.username}! 👋</h3>
                 <p>You are currently logged in.</p>
                 <a href="#" class="btn" onclick="logoutUser(); return false;">Logout</a>
                 <br>
-                <a href="products.html" class="btn" style="background:#333;">Continue Shopping</a>
+                <a href="products.html" class="btn" style="background:linear-gradient(135deg,#1a1a2e,#333); margin-top:10px;">Continue Shopping</a>
             </div>
         `;
     }
 
-    // Handle new account registration
     const regForm = document.getElementById('regform');
     if (regForm) {
         regForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const u = document.getElementById('reg-username').value;
+            const u  = document.getElementById('reg-username').value;
             const em = document.getElementById('reg-email').value;
-            const p = document.getElementById('reg-password').value;
+            const p  = document.getElementById('reg-password').value;
             const res = registerUser(u, em, p);
             if (res.success) {
-                showToast('Registration successful! Please login.');
+                showToast('✅ Registration successful! Please login.');
                 if (typeof showLogin === 'function') showLogin();
                 regForm.reset();
             } else {
-                showToast(res.message);
+                showToast('❌ ' + res.message);
             }
         });
     }
 
-    // Handle login form submission
     const loginForm = document.getElementById('loginform');
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
@@ -250,10 +266,10 @@ function setupAuth() {
             const p = document.getElementById('login-password').value;
             const res = loginUser(u, p);
             if (res.success) {
-                showToast('Login successful!');
+                showToast('✅ Login successful!');
                 setTimeout(() => window.location.href = 'index.html', 800);
             } else {
-                showToast(res.message);
+                showToast('❌ ' + res.message);
             }
         });
     }
@@ -262,7 +278,7 @@ function setupAuth() {
 // Loads and sets up the product detail page based on ?id= in the URL
 function setupProductDetail() {
     const nameEl = document.getElementById('product-name');
-    if (!nameEl) return; // we're not on the product detail page, skip
+    if (!nameEl) return;
 
     const urlParams = new URLSearchParams(window.location.search);
     const productId = parseInt(urlParams.get('id'));
@@ -280,34 +296,29 @@ function setupProductDetail() {
     document.getElementById('product-rating').innerHTML = getRatingHtml(product.rating);
     document.title = `ACEFASH | ${product.name}`;
 
-    // All gallery thumbnails show the same product image for now
     const smallImgs = document.getElementsByClassName('small-img');
     for (let i = 0; i < smallImgs.length; i++) {
         smallImgs[i].src = product.image;
         smallImgs[i].addEventListener('click', function() {
             document.getElementById('ProductImg').src = this.src;
-            // Keep the zoom panel in sync when user switches gallery image
             const zoomResult = document.getElementById('zoom-result');
             if (zoomResult) zoomResult.style.backgroundImage = `url(${this.src})`;
         });
     }
 
-    // Kick off the hover zoom feature
     setupZoom();
 
-    // Add to cart button — validates size is selected before adding
     const addBtn = document.getElementById('add-to-cart-btn');
     if (addBtn) {
         addBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const size = document.getElementById('product-size').value;
-            const qty = document.getElementById('product-quantity').value;
-            if (!size) { showToast('Please select a size!'); return; }
+            const qty  = document.getElementById('product-quantity').value;
+            if (!size) { showToast('⚠️ Please select a size!'); return; }
             addToCart(product.id, qty, size);
         });
     }
 
-    // Pick 4 random products (excluding the current one) as related suggestions
     const related = window.products.filter(p => p.id !== product.id).sort(() => 0.5 - Math.random()).slice(0, 4);
     renderProducts(related, 'related-products');
 }
@@ -315,11 +326,10 @@ function setupProductDetail() {
 // Hover zoom — magnifies the product image where your cursor is pointing
 function setupZoom() {
     const container = document.getElementById('zoom-container');
-    const img = document.getElementById('ProductImg');
+    const img    = document.getElementById('ProductImg');
     const result = document.getElementById('zoom-result');
     if (!container || !img || !result) return;
 
-    // Set the side panel background to match the current product image
     function updateZoomBg() {
         result.style.backgroundImage = `url(${img.src})`;
     }
@@ -327,17 +337,14 @@ function setupZoom() {
     img.addEventListener('load', updateZoomBg);
     if (img.complete) updateZoomBg();
 
-    // Track mouse position and zoom into that exact spot
     container.addEventListener('mousemove', (e) => {
         const rect = container.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
-
         img.style.transformOrigin = `${x}% ${y}%`;
         result.style.backgroundPosition = `${x}% ${y}%`;
     });
 
-    // Reset zoom origin when mouse leaves the image
     container.addEventListener('mouseleave', () => {
         img.style.transformOrigin = 'center center';
     });
@@ -351,69 +358,80 @@ function setupProductsPage() {
     let sorted = [...window.products];
     renderProducts(sorted, 'all-products');
 
-    // Re-sort and re-render whenever the user picks a different sort option
     const sortSelect = document.getElementById('sort-select');
     if (sortSelect) {
         sortSelect.addEventListener('change', () => {
             const val = sortSelect.value;
-            if (val === 'price-low') sorted.sort((a, b) => a.price - b.price);
+            if (val === 'price-low')  sorted.sort((a, b) => a.price - b.price);
             else if (val === 'price-high') sorted.sort((a, b) => b.price - a.price);
-            else if (val === 'rating') sorted.sort((a, b) => b.rating - a.rating);
+            else if (val === 'rating')     sorted.sort((a, b) => b.rating - a.rating);
             else sorted = [...window.products];
             renderProducts(sorted, 'all-products');
         });
     }
 }
 
-// Contact form just shows a thank-you toast for now (no backend yet)
+// Contact form just shows a thank-you toast
 function setupContact() {
     const form = document.getElementById('contact-form');
     if (form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            showToast('Message sent successfully! We will get back to you soon.');
+            showToast('✅ Message sent! We will get back to you soon.');
             form.reset();
         });
     }
 }
 
-// Checkout flow — checks login, clears cart, and confirms the order
-function setupCheckout() {
-    const btn = document.getElementById('checkout-btn');
-    if (btn) {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const user = getCurrentUser();
-            if (!user) {
-                showToast('Please login to checkout');
-                setTimeout(() => window.location.href = 'account.html', 1000);
-                return;
+// =====================================================
+// SCROLL REVEAL — Intersection Observer
+// =====================================================
+function initScrollReveal() {
+    const elements = document.querySelectorAll(
+        '.reveal, .reveal-left, .reveal-right, .reveal-scale'
+    );
+
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
             }
-            const cart = getCart();
-            if (cart.length === 0) {
-                showToast('Your cart is empty!');
-                return;
-            }
-            // Order placed — clear the cart and celebrate!
-            localStorage.setItem('cart', JSON.stringify([]));
-            updateCartBadge();
-            showToast('🎉 Order placed successfully! Thank you for shopping with ACEFASH!');
-            setTimeout(() => {
-                renderCart();
-            }, 500);
         });
-    }
+    }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+
+    elements.forEach(el => observer.observe(el));
 }
 
-// Everything kicks off here once the page has fully loaded
+// =====================================================
+// NAVBAR — scroll effect (add shadow)
+// =====================================================
+function initNavbarScroll() {
+    const navbar = document.getElementById('main-navbar');
+    if (!navbar) return;
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 40) navbar.classList.add('scrolled');
+        else navbar.classList.remove('scrolled');
+    }, { passive: true });
+}
+
+// =====================================================
+// Everything kicks off here once page has fully loaded
+// =====================================================
 document.addEventListener('DOMContentLoaded', () => {
     updateCartBadge();
     setupAuth();
+    initNavbarScroll();
+    initScrollReveal();
 
     // Home page product sections
-    renderProducts(window.products.slice(0, 4), 'featured-products');
-    renderProducts(window.products.slice(4, 8), 'latest-products-1');
-    renderProducts(window.products.slice(8, 12), 'latest-products-2');
+    if (document.getElementById('featured-products')) {
+        renderProducts(window.products.slice(0, 4), 'featured-products');
+        renderProducts(window.products.slice(4, 8), 'latest-products-1');
+        renderProducts(window.products.slice(8, 12), 'latest-products-2');
+    }
 
     setupProductsPage();
     setupProductDetail();
@@ -423,6 +441,5 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCart();
     }
 
-    setupCheckout();
     setupContact();
 });

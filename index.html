@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACEFASH | Online Fashion & Lifestyle</title>
+    <meta name="description" content="ACEFASH — Premium Online Fashion & Lifestyle Store. Shop T-Shirts, Shoes, Watches, Trackpants and more.">
+    <title>ACEFASH | Online Fashion &amp; Lifestyle</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -14,10 +15,10 @@
 <body>
     <!-- NOTICE BAR -->
     <div class="notice-bar">
-        <marquee behavior="scroll" direction="left" scrollamount="4">This is a production-ready website. The products
-            displayed are not actual — In the future, we will commercialize and sell genuine products!</marquee>
+        <marquee behavior="scroll" direction="left" scrollamount="4">🔥 FREE SHIPPING ON ORDERS ABOVE Rs.999 &nbsp;|&nbsp; 🎁 USE CODE ACEFASH10 FOR 10% OFF &nbsp;|&nbsp; ✅ 15-Day Easy Returns &nbsp;|&nbsp; 🚀 Express Delivery Available</marquee>
     </div>
-    <div class="navbar">
+
+    <div class="navbar" id="main-navbar">
         <div class="logo">
             <a href="index.html"><img src="logo.png" alt="ACEFASH"></a>
         </div>
@@ -39,12 +40,12 @@
     <div class="header">
         <div class="row">
             <div class="col-2">
-                <h1>Give Your Workout<br>A New Style!</h1>
+                <h1>Give Your Workout<br><span>A New Style!</span></h1>
                 <p>Success isn't always about greatness. It's about consistency. Consistent hard work gains success.
                     Greatness would come.</p>
                 <a href="products.html" class="btn">Explore Now &#8594;</a>
             </div>
-            <div class="col-2">
+            <div class="col-2 img-col">
                 <img src="image1.png" alt="Hero Image">
             </div>
         </div>
@@ -52,30 +53,47 @@
 
     <!-- CATEGORIES -->
     <div class="categories">
-        <div class="row">
-            <div class="col-3"><img src="category-1.jpg" alt="Category 1"></div>
-            <div class="col-3"><img src="category-2.jpg" alt="Category 2"></div>
-            <div class="col-3"><img src="category-3.jpg" alt="Category 3"></div>
+        <h2 class="section-title reveal">Shop By Category</h2>
+        <div class="row stagger-children">
+            <div class="col-3 reveal"><img src="category-1.jpg" alt="Category 1"></div>
+            <div class="col-3 reveal"><img src="category-2.jpg" alt="Category 2"></div>
+            <div class="col-3 reveal"><img src="category-3.jpg" alt="Category 3"></div>
         </div>
     </div>
 
     <!-- FEATURED PRODUCTS -->
     <div class="small-container">
-        <h2 class="section-title">Featured Products</h2>
-        <div class="products-row" id="featured-products"></div>
+        <h2 class="section-title reveal">Featured Products</h2>
+        <div class="products-row stagger-children" id="featured-products">
+            <!-- Skeletons while loading -->
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+        </div>
 
-        <h2 class="section-title">Latest Products</h2>
-        <div class="products-row" id="latest-products-1"></div>
-        <div class="products-row" id="latest-products-2"></div>
+        <h2 class="section-title reveal">Latest Products</h2>
+        <div class="products-row stagger-children" id="latest-products-1">
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+        </div>
+        <div class="products-row stagger-children" id="latest-products-2">
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+            <div class="product-skeleton"><div class="skeleton-img"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+        </div>
     </div>
 
     <!-- OFFER -->
     <div class="offer">
         <div class="row">
-            <div class="col-2">
+            <div class="col-2 reveal-left">
                 <img src="hugo_watch-removebg-preview.png" alt="Hugo Boss Watch">
             </div>
-            <div class="col-2">
+            <div class="col-2 reveal-right">
                 <p>Exclusively Available on ACEFASH</p>
                 <h1>Hugo Boss Streetdiver</h1>
                 <small>Want something unique and different? Then the Mens Street Diver Watch from HUGO is for you. Like
@@ -87,9 +105,9 @@
 
     <!-- TESTIMONIALS -->
     <div class="testimonial">
-        <h2 class="section-title">What Our Customers Say</h2>
-        <div class="row">
-            <div class="col-3">
+        <h2 class="section-title reveal">What Our Customers Say</h2>
+        <div class="row stagger-children">
+            <div class="col-3 reveal">
                 <i class="fa fa-quote-left"></i>
                 <p>Absolutely love shopping on this website! The variety of styles and trends is impressive. The quality
                     of the clothing is top-notch, and the prices are reasonable.</p>
@@ -100,7 +118,7 @@
                 <img src="user-1.png" alt="Sean Parker">
                 <h3>Sean Parker</h3>
             </div>
-            <div class="col-3">
+            <div class="col-3 reveal">
                 <i class="fa fa-quote-left"></i>
                 <p>This fashion website is my go-to for staying on trend. The clothes are not only fashionable but also
                     comfortable. Fast shipping and easy returns make it hassle-free.</p>
@@ -111,7 +129,7 @@
                 <img src="user-2.png" alt="Mike Smith">
                 <h3>Mike Smith</h3>
             </div>
-            <div class="col-3">
+            <div class="col-3 reveal">
                 <i class="fa fa-quote-left"></i>
                 <p>I can't say enough good things about this fashion website. The clothing is not only stylish but also
                     fits well. The sales and promotions are a bonus!</p>
@@ -126,23 +144,23 @@
     </div>
 
     <!-- FEATURES -->
-    <div class="features-bar">
-        <div class="feature-item">
+    <div class="features-bar stagger-children">
+        <div class="feature-item reveal">
             <img src="fship.png" alt="Free Shipping">
             <h4>FREE SHIPPING</h4>
             <p>We offer free shipping anywhere in India</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item reveal">
             <img src="fexch.png" alt="Free Exchange">
             <h4>FREE EXCHANGE / RETURN</h4>
             <p>We provide 15 days free exchange and return</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item reveal">
             <img src="100sec.png" alt="Secure Checkout">
             <h4>100% SECURE CHECKOUT</h4>
-            <p>We accept all kinds of payment methods</p>
+            <p>Powered by Razorpay — safe &amp; encrypted</p>
         </div>
-        <div class="feature-item">
+        <div class="feature-item reveal">
             <img src="fsatsfy.png" alt="Satisfaction">
             <h4>SATISFACTION GUARANTEED</h4>
             <p>Your satisfaction is our guarantee</p>
@@ -159,35 +177,33 @@
             <div class="footer-col">
                 <h3>Quick Links</h3>
                 <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="products.html">Products</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="account.html">My Account</a></li>
+                    <li><a href="index.html"><i class="fa fa-angle-right"></i> Home</a></li>
+                    <li><a href="products.html"><i class="fa fa-angle-right"></i> Products</a></li>
+                    <li><a href="contact.html"><i class="fa fa-angle-right"></i> Contact</a></li>
+                    <li><a href="account.html"><i class="fa fa-angle-right"></i> My Account</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h3>Categories</h3>
                 <ul>
-                    <li><a href="products.html">T-Shirts</a></li>
-                    <li><a href="products.html">Shoes</a></li>
-                    <li><a href="products.html">Watches</a></li>
-                    <li><a href="products.html">Trackpants</a></li>
+                    <li><a href="products.html"><i class="fa fa-angle-right"></i> T-Shirts</a></li>
+                    <li><a href="products.html"><i class="fa fa-angle-right"></i> Shoes</a></li>
+                    <li><a href="products.html"><i class="fa fa-angle-right"></i> Watches</a></li>
+                    <li><a href="products.html"><i class="fa fa-angle-right"></i> Trackpants</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h3>Follow Us</h3>
                 <ul>
-                    <li><a href="https://www.linkedin.com/in/aditya-sharma55/" target="_blank"><i
-                                class="fa fa-linkedin"></i> LinkedIn</a></li>
-                    <li><a href="https://www.instagram.com/aditya_sharma2909?igsh=bHJsaTQ3cTZ0M3dy" target="_blank"><i
-                                class="fa fa-instagram"></i> Instagram</a></li>
-                    <li><a href="https://www.facebook.com/share/1CKezvCDQY/" target="_blank"><i
-                                class="fa fa-facebook"></i> Facebook</a></li>
+                    <li><a href="https://www.linkedin.com/in/aditya-sharma55/" target="_blank"><i class="fa fa-linkedin"></i> LinkedIn</a></li>
+                    <li><a href="https://www.instagram.com/aditya_sharma2909?igsh=bHJsaTQ3cTZ0M3dy" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li>
+                    <li><a href="https://www.facebook.com/share/1CKezvCDQY/" target="_blank"><i class="fa fa-facebook"></i> Facebook</a></li>
                     <li><a href="#"><i class="fa fa-twitter"></i> Twitter</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
+            <p>&copy; 2026 ACEFASH. All Rights Reserved. Made with <i class="fa fa-heart" style="color:#ff523b;"></i> in India</p>
         </div>
     </div>
 
