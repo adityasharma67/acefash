@@ -229,15 +229,20 @@ function setupAuth() {
 
     const formContainer = document.getElementById('form-container');
     if (formContainer && currentUser) {
-        formContainer.innerHTML = `
-            <div class="logged-in-panel">
-                <h3>Welcome, ${currentUser.username}! 👋</h3>
-                <p>You are currently logged in.</p>
-                <a href="#" class="btn" onclick="logoutUser(); return false;">Logout</a>
-                <br>
-                <a href="products.html" class="btn" style="background:linear-gradient(135deg,#1a1a2e,#333); margin-top:10px;">Continue Shopping</a>
-            </div>
-        `;
+        // On account page: hide auth, show dashboard
+        if (typeof window.initDashboard === 'function') {
+            window.initDashboard(currentUser);
+        } else {
+            formContainer.innerHTML = `
+                <div class="logged-in-panel">
+                    <h3>Welcome, ${currentUser.username}! 👋</h3>
+                    <p>You are currently logged in.</p>
+                    <a href="#" class="btn" onclick="logoutUser(); return false;">Logout</a>
+                    <br>
+                    <a href="products.html" class="btn" style="background:linear-gradient(135deg,#1a1a2e,#333); margin-top:10px;">Continue Shopping</a>
+                </div>
+            `;
+        }
     }
 
     const regForm = document.getElementById('regform');

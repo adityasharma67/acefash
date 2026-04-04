@@ -268,13 +268,53 @@ function openRazorpay({ firstName, lastName, email, phone }) {
 // Handle payment success → show overlay + confetti
 // ----------------------------------------------------------
 function handlePaymentSuccess(response) {
-    const paymentId = response.razorpay_payment_id || 'N/A';
+    const paymentId = response.razorpay_payment_id || 'DEMO_' + Date.now();
+
+    // Build order snapshot from cart + form fields
+    const cart = getCart();
+    const orderItems = cart.map(item => {
+        const product = (window.products || []).find(p => p.id === item.productId);
+        return {
+            name:     product ? product.name  : 'Unknown Product',
+            image:    product ? product.image : 'product-1.jpg',
+            price:    product ? product.price : 0,
+            quantity: item.quantity,
+            size:     item.size || 'N/A'
+        };
+    });
+
+    const subtotal = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
+    const tax      = subtotal * 0.10;
+    const total    = subtotal + tax;
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const order = {
+        id:        paymentId,
+        paymentId: paymentId,
+        date:      dateStr,
+        status:    'Processing',
+        items:     orderItems,
+        total:     total,
+        city:      (document.getElementById('city')  || {}).value || '',
+        state:     (document.getElementById('state') || {}).value || '',
+    };
+
+    // Save to the logged-in user's order list
+    const user = getCurrentUser();
+    if (user) {
+        const key    = 'orders_' + user.username;
+        const orders = JSON.parse(localStorage.getItem(key)) || [];
+        orders.push(order);
+        localStorage.setItem(key, JSON.stringify(orders));
+    }
 
     // Clear cart
     localStorage.setItem('cart', JSON.stringify([]));
     updateCartBadge();
 
-    // Update success overlay payment ID
+    // Update success overlay
     const pidEl = document.getElementById('success-payment-id');
     if (pidEl) pidEl.textContent = 'Payment ID: ' + paymentId;
 
@@ -282,7 +322,6 @@ function handlePaymentSuccess(response) {
     const overlay = document.getElementById('success-overlay');
     if (overlay) {
         overlay.classList.add('show');
-        // Trigger SVG check animation
         const check = overlay.querySelector('.success-check');
         if (check) {
             check.style.strokeDashoffset = '200';
@@ -290,7 +329,6 @@ function handlePaymentSuccess(response) {
         }
     }
 
-    // Launch confetti
     launchConfetti();
 }
 

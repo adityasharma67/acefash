@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACEFASH My Account — View your profile, order history and manage your account.">
     <title>ACEFASH | My Account</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div class="notice-bar">
-        <marquee behavior="scroll" direction="left" scrollamount="4">This is a production-ready website. The products displayed are not actual — In the future, we will commercialize and sell genuine products!</marquee>
+        <marquee behavior="scroll" direction="left" scrollamount="4">🔥 FREE SHIPPING ON ORDERS ABOVE Rs.999 &nbsp;|&nbsp; ✅ 15-Day Easy Returns &nbsp;|&nbsp; 🔒 Secure Checkout via Razorpay</marquee>
     </div>
-    <div class="navbar">
+
+    <div class="navbar" id="main-navbar">
         <div class="logo"><a href="index.html"><img src="logo.png" alt="ACEFASH"></a></div>
         <nav>
             <ul>
@@ -25,15 +27,16 @@
         <a href="cart.html" class="cart-icon"><img src="cart.png" alt="Cart"><span id="cart-count" style="display:none;">0</span></a>
     </div>
 
-    <div class="account-page">
+    <!-- ========== AUTH SECTION (shown when NOT logged in) ========== -->
+    <div class="account-page" id="auth-section">
         <div class="row">
             <div class="col-2">
-                <img src="image1.png" alt="Fashion">
+                <img src="image1.png" alt="Fashion" style="animation: heroFloat 5s ease-in-out infinite;">
             </div>
             <div class="col-2">
                 <div class="form-container" id="form-container">
                     <div class="form-btn">
-                        <span onclick="showLogin()" id="login-tab">Login</span>
+                        <span onclick="showLogin()" id="login-tab" class="active-tab">Login</span>
                         <span onclick="showRegister()" id="register-tab">Register</span>
                         <hr id="indicator">
                     </div>
@@ -43,7 +46,7 @@
                         <button type="submit" class="btn">Login</button>
                         <a href="#">Forgot Password?</a>
                     </form>
-                    <form id="regform">
+                    <form id="regform" style="display:none;">
                         <input type="text" id="reg-username" placeholder="Username" required>
                         <input type="email" id="reg-email" placeholder="Email" required>
                         <input type="password" id="reg-password" placeholder="Password" required>
@@ -54,10 +57,143 @@
         </div>
     </div>
 
+    <!-- ========== DASHBOARD SECTION (shown when logged in) ========== -->
+    <div class="dashboard-page" id="dashboard-section" style="display:none;">
+        <div class="small-container" style="padding: 50px 30px 80px;">
+
+            <!-- Profile Header Banner -->
+            <div class="profile-banner reveal">
+                <div class="profile-avatar" id="profile-avatar-initials">A</div>
+                <div class="profile-banner-info">
+                    <h2 id="profile-welcome">Welcome back!</h2>
+                    <p id="profile-email-display">user@email.com</p>
+                    <span class="profile-badge"><i class="fa fa-star"></i> ACEFASH Member</span>
+                </div>
+                <button class="btn-outline" onclick="logoutUser()" style="margin-left:auto; flex-shrink:0;">
+                    <i class="fa fa-sign-out"></i> Logout
+                </button>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="profile-stats-row stagger-children">
+                <div class="profile-stat-card reveal">
+                    <i class="fa fa-shopping-bag"></i>
+                    <div>
+                        <span class="stat-number" id="stat-orders">0</span>
+                        <span class="stat-label">Total Orders</span>
+                    </div>
+                </div>
+                <div class="profile-stat-card reveal">
+                    <i class="fa fa-rupee"></i>
+                    <div>
+                        <span class="stat-number" id="stat-spent">0</span>
+                        <span class="stat-label">Total Spent</span>
+                    </div>
+                </div>
+                <div class="profile-stat-card reveal">
+                    <i class="fa fa-heart"></i>
+                    <div>
+                        <span class="stat-number">ACEFASH</span>
+                        <span class="stat-label">Member Since 2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="dashboard-tabs">
+                <button class="dash-tab active" id="tab-profile" onclick="switchTab('profile')">
+                    <i class="fa fa-user"></i> Profile
+                </button>
+                <button class="dash-tab" id="tab-orders" onclick="switchTab('orders')">
+                    <i class="fa fa-list-alt"></i> Order History
+                </button>
+            </div>
+
+            <!-- PROFILE TAB -->
+            <div class="dash-panel" id="panel-profile">
+                <div class="profile-info-grid">
+                    <div class="profile-info-card">
+                        <h3><i class="fa fa-user-circle"></i> Personal Information</h3>
+                        <div class="info-row">
+                            <label>Username</label>
+                            <span id="info-username">—</span>
+                        </div>
+                        <div class="info-row">
+                            <label>Email</label>
+                            <span id="info-email">—</span>
+                        </div>
+                        <div class="info-row">
+                            <label>Account Status</label>
+                            <span class="status-badge-green"><i class="fa fa-check-circle"></i> Active</span>
+                        </div>
+                        <div class="info-row">
+                            <label>Member Since</label>
+                            <span>April 2026</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-info-card">
+                        <h3><i class="fa fa-shield"></i> Account Security</h3>
+                        <div class="info-row">
+                            <label>Password</label>
+                            <span>••••••••</span>
+                        </div>
+                        <div class="info-row">
+                            <label>2FA</label>
+                            <span style="color:#aaa;">Not enabled</span>
+                        </div>
+                        <div class="info-row">
+                            <label>Login Method</label>
+                            <span>Username &amp; Password</span>
+                        </div>
+                        <div style="margin-top:20px;">
+                            <button class="btn-outline" onclick="logoutUser()" style="font-size:13px; padding:8px 20px;">
+                                <i class="fa fa-sign-out"></i> Sign Out
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="profile-info-card quick-links-card">
+                        <h3><i class="fa fa-bolt"></i> Quick Actions</h3>
+                        <a href="products.html" class="quick-action-btn">
+                            <i class="fa fa-shopping-bag"></i>
+                            <span>Shop Now</span>
+                            <i class="fa fa-angle-right" style="margin-left:auto;"></i>
+                        </a>
+                        <a href="cart.html" class="quick-action-btn">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span>View Cart</span>
+                            <i class="fa fa-angle-right" style="margin-left:auto;"></i>
+                        </a>
+                        <a href="checkout.html" class="quick-action-btn">
+                            <i class="fa fa-lock"></i>
+                            <span>Checkout</span>
+                            <i class="fa fa-angle-right" style="margin-left:auto;"></i>
+                        </a>
+                        <button class="quick-action-btn" onclick="switchTab('orders')">
+                            <i class="fa fa-list-alt"></i>
+                            <span>Order History</span>
+                            <i class="fa fa-angle-right" style="margin-left:auto;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ORDER HISTORY TAB -->
+            <div class="dash-panel" id="panel-orders" style="display:none;">
+                <div id="order-history-container">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
     <div class="footer">
         <div class="row">
             <div class="footer-col"><img src="logo.png" alt="ACEFASH"><p>Our Purpose Is To Sustainably Make the Pleasure and Benefits of Fashion Accessible to Many.</p></div>
-            <div class="footer-col"><h3>Quick Links</h3><ul><li><a href="index.html">Home</a></li><li><a href="products.html">Products</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+            <div class="footer-col"><h3>Quick Links</h3><ul><li><a href="index.html"><i class="fa fa-angle-right"></i> Home</a></li><li><a href="products.html"><i class="fa fa-angle-right"></i> Products</a></li><li><a href="contact.html"><i class="fa fa-angle-right"></i> Contact</a></li></ul></div>
             <div class="footer-col"><h3>Follow Us</h3><ul><li><a href="https://www.linkedin.com/in/aditya-sharma55/" target="_blank"><i class="fa fa-linkedin"></i> LinkedIn</a></li><li><a href="https://www.instagram.com/aditya_sharma2909?igsh=bHJsaTQ3cTZ0M3dy" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li><li><a href="https://www.facebook.com/share/1CKezvCDQY/" target="_blank"><i class="fa fa-facebook"></i> Facebook</a></li></ul></div>
         </div>
         <div class="footer-bottom"><p>&copy; 2026 ACEFASH. All Rights Reserved.</p></div>
@@ -67,15 +203,122 @@
     <script src="assets/js/products.js"></script>
     <script src="assets/js/main.js"></script>
     <script>
-        function showLogin() {
+        // Tab switching
+        window.switchTab = function(tab) {
+            ['profile', 'orders'].forEach(t => {
+                document.getElementById('tab-' + t).classList.remove('active');
+                document.getElementById('panel-' + t).style.display = 'none';
+            });
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('panel-' + tab).style.display = 'block';
+        };
+
+        // Login/Register form toggle
+        window.showLogin = function() {
             document.getElementById('loginform').style.display = 'block';
             document.getElementById('regform').style.display = 'none';
             document.getElementById('indicator').style.transform = 'translateX(0)';
-        }
-        function showRegister() {
+            document.getElementById('login-tab').classList.add('active-tab');
+            document.getElementById('register-tab').classList.remove('active-tab');
+        };
+
+        window.showRegister = function() {
             document.getElementById('loginform').style.display = 'none';
             document.getElementById('regform').style.display = 'block';
             document.getElementById('indicator').style.transform = 'translateX(100%)';
+            document.getElementById('register-tab').classList.add('active-tab');
+            document.getElementById('login-tab').classList.remove('active-tab');
+        };
+
+        // Dashboard initialisation — called from main.js after auth is set up
+        window.initDashboard = function(user) {
+            // Show dashboard, hide auth
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('dashboard-section').style.display = 'block';
+
+            // Profile banner
+            const initials = user.username.charAt(0).toUpperCase();
+            document.getElementById('profile-avatar-initials').textContent = initials;
+            document.getElementById('profile-welcome').textContent = 'Welcome back, ' + user.username + '! 👋';
+            document.getElementById('profile-email-display').textContent = user.email || 'No email on file';
+
+            // Profile info panel
+            document.getElementById('info-username').textContent = user.username;
+            document.getElementById('info-email').textContent = user.email || '—';
+
+            // Load orders
+            const orders = JSON.parse(localStorage.getItem('orders_' + user.username)) || [];
+            document.getElementById('stat-orders').textContent = orders.length;
+
+            const totalSpent = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+            document.getElementById('stat-spent').textContent = 'Rs. ' + totalSpent.toFixed(0);
+
+            // Render order history
+            renderOrderHistory(orders);
+
+            // Trigger scroll reveal
+            if (typeof initScrollReveal === 'function') initScrollReveal();
+        };
+
+        function renderOrderHistory(orders) {
+            const container = document.getElementById('order-history-container');
+            if (!container) return;
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fa fa-shopping-bag"></i>
+                        <h3>No orders yet</h3>
+                        <p>You haven't placed any orders. Start shopping!</p>
+                        <a href="products.html" class="btn" style="margin-top:16px;">Shop Now</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Newest first
+            const sorted = [...orders].reverse();
+
+            container.innerHTML = sorted.map((order, idx) => {
+                const statusColor = { 'Delivered': '#27ae60', 'Processing': '#f39c12', 'Shipped': '#3498db' };
+                const color = statusColor[order.status] || '#888';
+                const itemsHtml = (order.items || []).map(item => `
+                    <div class="order-product-row">
+                        <img src="${item.image || 'product-1.jpg'}" alt="${item.name}" onerror="this.src='product-1.jpg'">
+                        <div>
+                            <b>${item.name}</b><br>
+                            <small>Qty: ${item.quantity} · Size: ${item.size || 'N/A'} · Rs. ${(item.price * item.quantity).toFixed(2)}</small>
+                        </div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="order-history-card reveal">
+                        <div class="order-history-header">
+                            <div>
+                                <span class="order-id-label">Order #${order.id || (idx + 1)}</span>
+                                <span class="order-date">${order.date || 'April 2026'}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <span class="order-status-pill" style="background:${color}20; color:${color}; border:1px solid ${color}50;">
+                                    <i class="fa fa-circle" style="font-size:8px;"></i> ${order.status || 'Processing'}
+                                </span>
+                                <span class="order-total-pill">Rs. ${(order.total || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="order-products-list">
+                            ${itemsHtml || '<p style="color:#aaa; font-size:13px; padding:10px 0;">Order details loading...</p>'}
+                        </div>
+                        <div class="order-history-footer">
+                            <span style="font-size:12px; color:#aaa;">Payment ID: ${order.paymentId || 'N/A'}</span>
+                            <span style="font-size:12px; color:#aaa;">Addr: ${order.city || '—'}, ${order.state || '—'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Re-trigger scroll reveal on injected cards
+            if (typeof initScrollReveal === 'function') initScrollReveal();
         }
     </script>
 </body>
