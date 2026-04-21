@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeFromCart, updateCartQuantity } from '../features/cart/cartSlice';
 import { currency } from '../utils/currency';
+import { imagePlaceholder, resolveImageSrc } from '../utils/image';
 
 function CartPage() {
   const dispatch = useDispatch();
@@ -26,12 +27,11 @@ function CartPage() {
         {items.map((item) => (
           <article key={item.productId} className="flex gap-4 rounded-2xl border border-amber-100 bg-white p-4">
             <img
-              src={
-                item.image
-                  ? `${import.meta.env.VITE_UPLOADS_URL || 'http://localhost:5000'}${item.image}`
-                  : 'https://placehold.co/200x200/F5F5F5/1f2937?text=Item'
-              }
+              src={resolveImageSrc(item.image, imagePlaceholder)}
               alt={item.title}
+              onError={(e) => {
+                e.currentTarget.src = imagePlaceholder;
+              }}
               className="h-24 w-24 rounded-xl object-cover"
             />
             <div className="flex flex-1 flex-col justify-between">

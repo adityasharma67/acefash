@@ -1,11 +1,15 @@
-import { ShoppingCart, User, LogOut, Shield } from 'lucide-react';
+import { ShoppingCart, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, logoutUser } from '../../features/auth/authSlice';
 
 const navLinkClass = ({ isActive }) =>
-  `text-sm font-semibold tracking-wide ${isActive ? 'text-[#d67d00]' : 'text-slate-700 hover:text-[#d67d00]'}`;
+  `text-sm font-semibold tracking-[0.08em] uppercase ${
+    isActive
+      ? 'text-[#ff523b] border-b-2 border-[#ff523b] pb-1'
+      : 'text-slate-500 hover:text-[#ff523b]'
+  }`;
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -28,11 +32,11 @@ function Navbar() {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-50 border-b border-amber-100 bg-white/90 backdrop-blur"
+      className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur"
     >
-      <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-8">
-        <Link to="/" className="text-2xl font-black uppercase tracking-[0.2em] text-slate-900">
-          AceFash
+      <nav className="mx-auto flex w-full max-w-[1500px] items-center justify-between px-6 py-4 lg:px-12">
+        <Link to="/" className="shrink-0">
+          <img src="/logo.png" alt="AceFash" className="h-16 w-auto object-contain" />
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
@@ -42,9 +46,24 @@ function Navbar() {
           <NavLink to="/products" className={navLinkClass}>
             Shop
           </NavLink>
+          <NavLink to="/contact" className={navLinkClass}>
+            Contact
+          </NavLink>
           <NavLink to="/dashboard" className={navLinkClass}>
             Dashboard
           </NavLink>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="text-sm font-semibold uppercase tracking-[0.08em] text-slate-600 hover:text-[#ff523b]"
+            >
+              Logout ({user.name?.split(' ')[0] || 'User'})
+            </button>
+          ) : (
+            <NavLink to="/login" className={navLinkClass}>
+              Login
+            </NavLink>
+          )}
           {user?.role === 'admin' && (
             <NavLink to="/admin" className={navLinkClass}>
               Admin
@@ -53,31 +72,22 @@ function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link to="/cart" className="relative rounded-full border border-amber-200 p-2 text-slate-800">
+          <Link to="/cart" className="relative rounded-full border border-slate-300 p-2 text-slate-800">
             <ShoppingCart size={18} />
-            <span className="absolute -right-2 -top-2 rounded-full bg-[#d67d00] px-1.5 text-xs text-white">
+            <span className="absolute -right-2 -top-2 rounded-full bg-[#ff523b] px-1.5 text-xs text-white">
               {cartCount}
             </span>
           </Link>
 
           {user ? (
-            <>
-              <span className="hidden items-center gap-1 text-sm font-semibold text-slate-700 md:inline-flex">
-                {user.role === 'admin' ? <Shield size={16} /> : <User size={16} />}
-                {user.name}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="rounded-full border border-slate-300 p-2 text-slate-700 hover:bg-slate-100"
-              >
-                <LogOut size={18} />
-              </button>
-            </>
-          ) : (
-            <Link
-              to="/login"
-              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700"
+            <button
+              onClick={handleLogout}
+              className="rounded-full border border-slate-300 p-2 text-slate-700 md:hidden"
             >
+              <LogOut size={16} />
+            </button>
+          ) : (
+            <Link to="/login" className="text-xs font-semibold uppercase tracking-wide text-slate-600 md:hidden">
               Login
             </Link>
           )}

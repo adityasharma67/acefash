@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { fetchProductById } from '../features/products/productSlice';
 import { addToCart } from '../features/cart/cartSlice';
 import { currency } from '../utils/currency';
+import { imagePlaceholder, resolveImageSrc } from '../utils/image';
 
 function ProductDetailsPage() {
   const { id } = useParams();
@@ -37,12 +38,11 @@ function ProductDetailsPage() {
   return (
     <section className="grid gap-8 md:grid-cols-2">
       <img
-        src={
-          product.images?.[0]
-            ? `${import.meta.env.VITE_UPLOADS_URL || 'http://localhost:5000'}${product.images[0]}`
-            : 'https://placehold.co/800x650/F5F5F5/1f2937?text=No+Image'
-        }
+        src={resolveImageSrc(product.images?.[0], imagePlaceholder)}
         alt={product.title}
+        onError={(e) => {
+          e.currentTarget.src = imagePlaceholder;
+        }}
         className="h-[420px] w-full rounded-2xl object-cover"
       />
 

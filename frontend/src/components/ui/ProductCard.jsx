@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { ShoppingBag } from 'lucide-react';
 import { addToCart } from '../../features/cart/cartSlice';
 import { currency } from '../../utils/currency';
+import { imagePlaceholder, resolveImageSrc } from '../../utils/image';
 
 function ProductCard({ product }) {
   const dispatch = useDispatch();
@@ -31,12 +32,11 @@ function ProductCard({ product }) {
     >
       <Link to={`/products/${product._id}`}>
         <img
-          src={
-            product.images?.[0]
-              ? `${import.meta.env.VITE_UPLOADS_URL || 'http://localhost:5000'}${product.images[0]}`
-              : 'https://placehold.co/600x500/F5F5F5/1f2937?text=No+Image'
-          }
+          src={resolveImageSrc(product.images?.[0], imagePlaceholder)}
           alt={product.title}
+          onError={(e) => {
+            e.currentTarget.src = imagePlaceholder;
+          }}
           className="h-52 w-full rounded-xl object-cover"
         />
       </Link>
