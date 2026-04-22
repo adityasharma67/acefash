@@ -293,6 +293,20 @@ window.fetchMyOrdersFromServer = async function() {
     return data.orders || [];
 };
 
+window.fetchAllOrdersFromServer = async function() {
+    const data = await apiRequest('/orders', { requiresAuth: true });
+    return data.orders || [];
+};
+
+window.updateOrderStatusOnServer = async function(orderId, status) {
+    const data = await apiRequest(`/orders/${orderId}/status`, {
+        method: 'PATCH',
+        body: { status },
+        requiresAuth: true,
+    });
+    return data.order;
+};
+
 window.updateProfileOnServer = async function(profilePayload) {
     const data = await apiRequest('/auth/profile', {
         method: 'PUT',

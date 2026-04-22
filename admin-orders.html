@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACEFASH Admin Orders - manage order status and tracking timeline.">
+    <title>ACEFASH | Admin Orders</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="notice-bar">
+        <marquee behavior="scroll" direction="left" scrollamount="4">🛠️ Admin Console: Update status and keep customer timelines accurate in real time.</marquee>
+    </div>
+
+    <div class="navbar" id="main-navbar">
+        <div class="logo"><a href="index.html"><img src="logo.png" alt="ACEFASH"></a></div>
+        <nav>
+            <ul>
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="products.html">PRODUCTS</a></li>
+                <li><a href="account.html">ACCOUNT</a></li>
+                <li><a href="admin-orders.html" class="active">ADMIN</a></li>
+            </ul>
+        </nav>
+        <a href="cart.html" class="cart-icon"><img src="cart.png" alt="Cart"><span id="cart-count" style="display:none;">0</span></a>
+    </div>
+
+    <div class="admin-orders-page">
+        <div class="small-container" style="padding: 40px 30px 70px;">
+            <div class="products-header reveal">
+                <h2>Admin Order Control</h2>
+                <button class="btn-outline" id="refresh-admin-orders"><i class="fa fa-refresh"></i> Refresh</button>
+            </div>
+            <p class="products-count" id="admin-order-count">Loading orders...</p>
+            <div id="admin-orders-container"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="row">
+            <div class="footer-col"><img src="logo.png" alt="ACEFASH"><p>Our purpose is to make quality sports gear and active essentials accessible to every athlete.</p></div>
+            <div class="footer-col"><h3>Quick Links</h3><ul><li><a href="index.html"><i class="fa fa-angle-right"></i> Home</a></li><li><a href="products.html"><i class="fa fa-angle-right"></i> Products</a></li><li><a href="account.html"><i class="fa fa-angle-right"></i> Account</a></li></ul></div>
+            <div class="footer-col"><h3>Follow Us</h3><ul><li><a href="https://www.linkedin.com/in/aditya-sharma55/" target="_blank"><i class="fa fa-linkedin"></i> LinkedIn</a></li><li><a href="https://www.instagram.com/aditya_sharma2909?igsh=bHJsaTQ3cTZ0M3dy" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li></ul></div>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2026 ACEFASH. All Rights Reserved.</p></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="assets/js/products.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        function formatDateTime(isoDate) {
+            if (!isoDate) return 'Pending';
+            const dt = new Date(isoDate);
+            if (Number.isNaN(dt.getTime())) return 'Pending';
+            return dt.toLocaleString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function normalizeStatus(status) {
+            if (!status) return 'processing';
+            return status.toLowerCase();
+        }
+
+        function toTitleCase(status) {
+            return status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        function timelineHtml(order) {
+            const timeline = order.statusTimeline || {};
+            return `
+                <div class="order-timeline">
+                    <div class="timeline-step ${timeline.processingAt ? 'done' : ''}">
+                        <span>Processing</span>
+                        <small>${formatDateTime(timeline.processingAt || order.createdAt)}</small>
+                    </div>
+                    <div class="timeline-step ${timeline.shippedAt ? 'done' : ''}">
+                        <span>Shipped</span>
+                        <small>${formatDateTime(timeline.shippedAt)}</small>
+                    </div>
+                    <div class="timeline-step ${timeline.deliveredAt ? 'done' : ''}">
+                        <span>Delivered</span>
+                        <small>${formatDateTime(timeline.deliveredAt)}</small>
+                    </div>
+                </div>
+            `;
+        }
+
+        function orderCardHtml(order) {
+            const status = normalizeStatus(order.orderStatus);
+            const statusColor = {
+                processing: '#f39c12',
+                shipped: '#3498db',
+                delivered: '#27ae60',
+                cancelled: '#c0392b'
+            };
+            const color = statusColor[status] || '#888';
+
+            const itemsHtml = (order.items || []).map(item => `
+                <div class="order-product-row">
+                    <img src="${item.image || 'product-1.jpg'}" alt="${item.title || item.name}" onerror="this.src='product-1.jpg'">
+                    <div>
+                        <b>${item.title || item.name}</b><br>
+                        <small>Qty: ${item.quantity} · Size: ${item.size || 'N/A'} · Rs. ${(item.price * item.quantity).toFixed(2)}</small>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="order-history-card reveal admin-order-card" data-order-id="${order._id}">
+                    <div class="order-history-header">
+                        <div>
+                            <span class="order-id-label">Order #${order.orderNumber || order._id}</span>
+                            <span class="order-date">${formatDateTime(order.createdAt)}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span class="order-status-pill" style="background:${color}20; color:${color}; border:1px solid ${color}50;">
+                                <i class="fa fa-circle" style="font-size:8px;"></i> ${toTitleCase(status)}
+                            </span>
+                            <span class="order-total-pill">Rs. ${(order.totalPrice || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    ${timelineHtml(order)}
+
+                    <div class="order-products-list">${itemsHtml}</div>
+
+                    <div class="admin-status-actions">
+                        <button class="status-btn ${status === 'processing' ? 'active' : ''}" onclick="updateOrderStatus('${order._id}', 'processing')">Processing</button>
+                        <button class="status-btn ${status === 'shipped' ? 'active' : ''}" onclick="updateOrderStatus('${order._id}', 'shipped')">Shipped</button>
+                        <button class="status-btn ${status === 'delivered' ? 'active' : ''}" onclick="updateOrderStatus('${order._id}', 'delivered')">Delivered</button>
+                    </div>
+
+                    <div class="order-history-footer">
+                        <span style="font-size:12px; color:#aaa;">Payment ID: ${order.paymentId || 'N/A'}</span>
+                        <span style="font-size:12px; color:#aaa;">Customer: ${(order.user && (order.user.name || order.user.email)) || 'Unknown'}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadAdminOrders() {
+            const container = document.getElementById('admin-orders-container');
+            const countEl = document.getElementById('admin-order-count');
+
+            try {
+                const user = await window.syncCurrentUserFromServer();
+                if (!user) {
+                    showToast('⚠️ Please login first');
+                    setTimeout(() => { window.location.href = 'account.html'; }, 700);
+                    return;
+                }
+
+                if (user.role !== 'admin') {
+                    container.innerHTML = `
+                        <div class="empty-orders">
+                            <i class="fa fa-lock"></i>
+                            <h3>Admin access required</h3>
+                            <p>This page is only available for admin users.</p>
+                        </div>
+                    `;
+                    countEl.textContent = 'Access denied';
+                    return;
+                }
+
+                const orders = await window.fetchAllOrdersFromServer();
+                countEl.textContent = `Total Orders: ${orders.length}`;
+
+                if (!orders.length) {
+                    container.innerHTML = `
+                        <div class="empty-orders">
+                            <i class="fa fa-shopping-bag"></i>
+                            <h3>No orders found</h3>
+                            <p>Once users place orders, they will appear here.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = orders.map(orderCardHtml).join('');
+                if (typeof initScrollReveal === 'function') initScrollReveal();
+            } catch (error) {
+                countEl.textContent = 'Could not load orders';
+                container.innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        <h3>Failed to load orders</h3>
+                        <p>${error.message || 'Try again in a moment.'}</p>
+                    </div>
+                `;
+            }
+        }
+
+        window.updateOrderStatus = async function(orderId, status) {
+            try {
+                await window.updateOrderStatusOnServer(orderId, status);
+                showToast('✅ Order status updated to ' + toTitleCase(status));
+                await loadAdminOrders();
+            } catch (error) {
+                showToast('❌ ' + (error.message || 'Failed to update status'));
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await setupAuth();
+            initNavbarScroll();
+            initScrollReveal();
+            document.getElementById('refresh-admin-orders').addEventListener('click', loadAdminOrders);
+            await loadAdminOrders();
+        });
+    </script>
+</body>
+</html>

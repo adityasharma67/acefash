@@ -2398,6 +2398,46 @@ p{ color: #555; line-height: 1.7; }
     font-weight: 600;
 }
 
+.admin-orders-page {
+    min-height: 75vh;
+    background: linear-gradient(135deg, #f8f9ff 0%, #fff5f4 100%);
+}
+
+.admin-order-card {
+    border-left: 4px solid #ff523b;
+}
+
+.admin-status-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.status-btn {
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #555;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.status-btn:hover {
+    border-color: #ff523b;
+    color: #ff523b;
+}
+
+.status-btn.active {
+    background: linear-gradient(135deg, #ff523b, #ff7a68);
+    border-color: #ff523b;
+    color: #fff;
+}
+
 /* ---- Responsive Dashboard ---- */
 @media (max-width: 900px) {
     .profile-info-grid { grid-template-columns: 1fr 1fr; }

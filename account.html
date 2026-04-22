@@ -176,6 +176,11 @@
                             <span>Order History</span>
                             <i class="fa fa-angle-right" style="margin-left:auto;"></i>
                         </button>
+                        <a href="admin-orders.html" class="quick-action-btn" id="admin-orders-link" style="display:none;">
+                            <i class="fa fa-cog"></i>
+                            <span>Admin Order Control</span>
+                            <i class="fa fa-angle-right" style="margin-left:auto;"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -312,6 +317,11 @@
 
             const memberSinceEl = document.getElementById('stat-member-since');
             if (memberSinceEl) memberSinceEl.textContent = formatMemberSince(freshUser.createdAt);
+
+            const adminOrdersLink = document.getElementById('admin-orders-link');
+            if (adminOrdersLink) {
+                adminOrdersLink.style.display = freshUser.role === 'admin' ? 'flex' : 'none';
+            }
 
             let orders = [];
             try {
