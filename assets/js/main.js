@@ -31,6 +31,7 @@ function createProductCard(product) {
             <img src="${product.image}" alt="${product.name}" loading="lazy">
             <div class="product-info">
                 <h4>${product.name}</h4>
+                <small class="product-category-tag">${product.category}</small>
                 <p>Rs. ${product.price.toFixed(2)}</p>
                 <div class="rating">${getRatingHtml(product.rating)}</div>
             </div>
@@ -46,6 +47,48 @@ function renderProducts(list, containerId) {
     // Trigger reveal for newly injected cards
     initScrollReveal();
 }
+
+const API_BASE = window.ACEFASH_API_BASE || localStorage.getItem('acefash_api_base') || 'http://localhost:5000/api';
+
+function getAuthToken() {
+    return localStorage.getItem('authToken') || '';
+}
+
+function setAuthSession(token, user) {
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+}
+
+function clearAuthSession() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+}
+
+async function apiRequest(path, { method = 'GET', body, requiresAuth = false } = {}) {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = getAuthToken();
+
+    if (requiresAuth) {
+        if (!token) throw new Error('Please login to continue');
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${API_BASE}${path}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+        throw new Error(data.message || 'Something went wrong');
+    }
+
+    return data;
+}
+
+window.apiRequest = apiRequest;
 
 // Pulls the saved cart from browser storage
 function getCart() {
@@ -174,9 +217,9 @@ window.updateCartQty = function(index, val) {
     }
 };
 
-// Fetches all registered users from storage
+// Backward compatibility helper used by account page script
 function getUsers() {
-    return JSON.parse(localStorage.getItem('users')) || [];
+    return [];
 }
 
 // Returns whoever is currently logged in (or null if no one is)
@@ -184,42 +227,100 @@ function getCurrentUser() {
     return JSON.parse(localStorage.getItem('currentUser'));
 }
 
-// Saves a new user — rejects if username is already taken
-function registerUser(username, email, password) {
-    const users = getUsers();
-    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-        return { success: false, message: 'Username already exists' };
+async function syncCurrentUserFromServer() {
+    const token = getAuthToken();
+    if (!token) return getCurrentUser();
+
+    try {
+        const data = await apiRequest('/auth/me', { requiresAuth: true });
+        const user = {
+            id: data.user._id || data.user.id,
+            name: data.user.name,
+            email: data.user.email,
+            role: data.user.role,
+            phone: data.user.phone || '',
+            preferredSport: data.user.preferredSport || '',
+            defaultShippingAddress: data.user.defaultShippingAddress || {},
+            createdAt: data.user.createdAt,
+        };
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        return user;
+    } catch (error) {
+        clearAuthSession();
+        return null;
     }
-    users.push({ username, email, password });
-    localStorage.setItem('users', JSON.stringify(users));
-    return { success: true };
 }
 
-// Checks credentials and logs in the user if they match
-function loginUser(username, password) {
-    const users = getUsers();
-    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-    if (user) {
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        return { success: true };
+// Saves a new user via backend API
+async function registerUser(name, email, password) {
+    try {
+        const data = await apiRequest('/auth/register', {
+            method: 'POST',
+            body: { name, email, password },
+        });
+
+        setAuthSession(data.token, data.user);
+        return { success: true, user: data.user };
+    } catch (error) {
+        return { success: false, message: error.message };
     }
-    return { success: false, message: 'Invalid username or password' };
+}
+
+// Checks credentials via backend API
+async function loginUser(email, password) {
+    try {
+        const data = await apiRequest('/auth/login', {
+            method: 'POST',
+            body: { email, password },
+        });
+
+        setAuthSession(data.token, data.user);
+        return { success: true, user: data.user };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
 }
 
 // Clears the session and refreshes the page
 function logoutUser() {
-    localStorage.removeItem('currentUser');
+    clearAuthSession();
     showToast('Logged out successfully');
     setTimeout(() => window.location.reload(), 500);
 }
 
+window.fetchMyOrdersFromServer = async function() {
+    const data = await apiRequest('/orders/my-orders', { requiresAuth: true });
+    return data.orders || [];
+};
+
+window.updateProfileOnServer = async function(profilePayload) {
+    const data = await apiRequest('/auth/profile', {
+        method: 'PUT',
+        body: profilePayload,
+        requiresAuth: true,
+    });
+    localStorage.setItem('currentUser', JSON.stringify(data.user));
+    return data.user;
+};
+
+window.createStorefrontOrderOnServer = async function(orderPayload) {
+    const data = await apiRequest('/orders/storefront', {
+        method: 'POST',
+        body: orderPayload,
+        requiresAuth: true,
+    });
+    return data.order;
+};
+
+window.syncCurrentUserFromServer = syncCurrentUserFromServer;
+
 // Wires up auth-related UI — login nav label, register form, login form
-function setupAuth() {
-    const currentUser = getCurrentUser();
+async function setupAuth() {
+    const currentUser = await syncCurrentUserFromServer();
 
     const accountLink = document.getElementById('account-link');
     if (accountLink && currentUser) {
-        accountLink.innerText = `LOGOUT (${currentUser.username})`;
+        accountLink.innerText = `LOGOUT (${currentUser.name})`;
         accountLink.href = '#';
         accountLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -235,7 +336,7 @@ function setupAuth() {
         } else {
             formContainer.innerHTML = `
                 <div class="logged-in-panel">
-                    <h3>Welcome, ${currentUser.username}! 👋</h3>
+                    <h3>Welcome, ${currentUser.name}! 👋</h3>
                     <p>You are currently logged in.</p>
                     <a href="#" class="btn" onclick="logoutUser(); return false;">Logout</a>
                     <br>
@@ -247,16 +348,15 @@ function setupAuth() {
 
     const regForm = document.getElementById('regform');
     if (regForm) {
-        regForm.addEventListener('submit', (e) => {
+        regForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const u  = document.getElementById('reg-username').value;
+            const u  = document.getElementById('reg-name').value;
             const em = document.getElementById('reg-email').value;
             const p  = document.getElementById('reg-password').value;
-            const res = registerUser(u, em, p);
+            const res = await registerUser(u, em, p);
             if (res.success) {
-                showToast('✅ Registration successful! Please login.');
-                if (typeof showLogin === 'function') showLogin();
-                regForm.reset();
+                showToast('✅ Registration successful!');
+                setTimeout(() => window.location.href = 'account.html', 600);
             } else {
                 showToast('❌ ' + res.message);
             }
@@ -265,14 +365,14 @@ function setupAuth() {
 
     const loginForm = document.getElementById('loginform');
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const u = document.getElementById('login-username').value;
+            const u = document.getElementById('login-email').value;
             const p = document.getElementById('login-password').value;
-            const res = loginUser(u, p);
+            const res = await loginUser(u, p);
             if (res.success) {
                 showToast('✅ Login successful!');
-                setTimeout(() => window.location.href = 'index.html', 800);
+                setTimeout(() => window.location.href = 'account.html', 800);
             } else {
                 showToast('❌ ' + res.message);
             }
@@ -360,18 +460,102 @@ function setupProductsPage() {
     const container = document.getElementById('all-products');
     if (!container) return;
 
-    let sorted = [...window.products];
-    renderProducts(sorted, 'all-products');
-
+    const categorySelect = document.getElementById('category-select');
     const sortSelect = document.getElementById('sort-select');
+    const searchInput = document.getElementById('search-input');
+    const paginationEl = document.getElementById('pagination-controls');
+    const countEl = document.getElementById('products-count');
+    const products = [...window.products];
+    const pageSize = 12;
+    let currentPage = 1;
+
+    if (categorySelect) {
+        const categories = [...new Set(products.map(p => p.category))].sort();
+        categorySelect.innerHTML = '<option value="all">All Categories</option>' +
+            categories.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    const renderPagination = (totalPages) => {
+        if (!paginationEl) return;
+        if (totalPages <= 1) {
+            paginationEl.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+
+        for (let page = 1; page <= totalPages; page++) {
+            html += `<button class="pagination-btn ${page === currentPage ? 'active' : ''}" data-page="${page}">${page}</button>`;
+        }
+
+        paginationEl.innerHTML = html;
+
+        paginationEl.querySelectorAll('[data-page]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                currentPage = Number(btn.getAttribute('data-page'));
+                applyFilters();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    };
+
+    const applyFilters = () => {
+        let list = [...products];
+        const selectedCategory = categorySelect ? categorySelect.value : 'all';
+        const sortBy = sortSelect ? sortSelect.value : 'default';
+        const searchTerm = (searchInput ? searchInput.value : '').trim().toLowerCase();
+
+        if (selectedCategory !== 'all') {
+            list = list.filter(p => p.category === selectedCategory);
+        }
+
+        if (searchTerm) {
+            list = list.filter((p) =>
+                p.name.toLowerCase().includes(searchTerm) ||
+                p.category.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        if (sortBy === 'price-low') list.sort((a, b) => a.price - b.price);
+        else if (sortBy === 'price-high') list.sort((a, b) => b.price - a.price);
+        else if (sortBy === 'rating') list.sort((a, b) => b.rating - a.rating);
+
+        const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+        if (currentPage > totalPages) currentPage = 1;
+
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageItems = list.slice(start, end);
+
+        renderProducts(pageItems, 'all-products');
+        renderPagination(totalPages);
+
+        if (countEl) {
+            if (!list.length) {
+                countEl.textContent = 'No products found';
+            } else {
+                countEl.textContent = `Showing ${start + 1}-${Math.min(end, list.length)} of ${list.length} products`;
+            }
+        }
+    };
+
+    applyFilters();
+
     if (sortSelect) {
-        sortSelect.addEventListener('change', () => {
-            const val = sortSelect.value;
-            if (val === 'price-low')  sorted.sort((a, b) => a.price - b.price);
-            else if (val === 'price-high') sorted.sort((a, b) => b.price - a.price);
-            else if (val === 'rating')     sorted.sort((a, b) => b.rating - a.rating);
-            else sorted = [...window.products];
-            renderProducts(sorted, 'all-products');
+        sortSelect.addEventListener('change', applyFilters);
+    }
+
+    if (categorySelect) {
+        categorySelect.addEventListener('change', () => {
+            currentPage = 1;
+            applyFilters();
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            applyFilters();
         });
     }
 }
@@ -425,9 +609,9 @@ function initNavbarScroll() {
 // =====================================================
 // Everything kicks off here once page has fully loaded
 // =====================================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     updateCartBadge();
-    setupAuth();
+    await setupAuth();
     initNavbarScroll();
     initScrollReveal();
 

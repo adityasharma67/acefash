@@ -15,9 +15,9 @@ const RAZORPAY_KEY = 'rzp_test_YOUR_KEY_HERE';
 let selectedPayMethod = 'upi';
 let orderTotal = 0;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     updateCartBadge();
-    setupAuth();
+    await setupAuth();
     renderCheckoutSummary();
     setupCheckoutForm();
 });
@@ -166,6 +166,11 @@ function setupCheckoutForm() {
 
         // Check login
         const user = getCurrentUser();
+        if (!user) {
+            showToast('⚠️ Please login before placing an order');
+            setTimeout(() => { window.location.href = 'account.html'; }, 800);
+            return;
+        }
 
         const firstName = document.getElementById('first-name').value.trim();
         const lastName  = document.getElementById('last-name').value.trim();
@@ -196,7 +201,7 @@ function openRazorpay({ firstName, lastName, email, phone }) {
         amount: amountInPaise,
         currency: 'INR',
         name: 'ACEFASH',
-        description: 'Fashion & Lifestyle Order',
+        description: 'Sports Gear Order',
         image: 'logo.png',
         prefill: {
             name:    `${firstName} ${lastName}`,
@@ -267,7 +272,7 @@ function openRazorpay({ firstName, lastName, email, phone }) {
 // ----------------------------------------------------------
 // Handle payment success → show overlay + confetti
 // ----------------------------------------------------------
-function handlePaymentSuccess(response) {
+async function handlePaymentSuccess(response) {
     const paymentId = response.razorpay_payment_id || 'DEMO_' + Date.now();
 
     // Build order snapshot from cart + form fields
@@ -275,7 +280,8 @@ function handlePaymentSuccess(response) {
     const orderItems = cart.map(item => {
         const product = (window.products || []).find(p => p.id === item.productId);
         return {
-            name:     product ? product.name  : 'Unknown Product',
+            productId: item.productId,
+            title:     product ? product.name  : 'Unknown Product',
             image:    product ? product.image : 'product-1.jpg',
             price:    product ? product.price : 0,
             quantity: item.quantity,
@@ -286,28 +292,39 @@ function handlePaymentSuccess(response) {
     const subtotal = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
     const tax      = subtotal * 0.10;
     const total    = subtotal + tax;
-
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-
-    const order = {
-        id:        paymentId,
-        paymentId: paymentId,
-        date:      dateStr,
-        status:    'Processing',
-        items:     orderItems,
-        total:     total,
-        city:      (document.getElementById('city')  || {}).value || '',
-        state:     (document.getElementById('state') || {}).value || '',
+    const shippingAddress = {
+        firstName: (document.getElementById('first-name') || {}).value || '',
+        lastName: (document.getElementById('last-name') || {}).value || '',
+        email: (document.getElementById('checkout-email') || {}).value || '',
+        phone: (document.getElementById('checkout-phone') || {}).value || '',
+        addressLine: (document.getElementById('address-line') || {}).value || '',
+        city: (document.getElementById('city') || {}).value || '',
+        state: (document.getElementById('state') || {}).value || '',
+        pincode: (document.getElementById('pincode') || {}).value || ''
     };
 
-    // Save to the logged-in user's order list
-    const user = getCurrentUser();
-    if (user) {
-        const key    = 'orders_' + user.username;
-        const orders = JSON.parse(localStorage.getItem(key)) || [];
-        orders.push(order);
-        localStorage.setItem(key, JSON.stringify(orders));
+    let savedOrder = null;
+    try {
+        if (typeof window.createStorefrontOrderOnServer !== 'function') {
+            throw new Error('Order API helper missing');
+        }
+
+        savedOrder = await window.createStorefrontOrderOnServer({
+            items: orderItems,
+            shippingAddress,
+            paymentMethod: selectedPayMethod,
+            paymentStatus: 'paid',
+            paymentId,
+            frontendTotals: {
+                subtotal,
+                tax,
+                total,
+            },
+        });
+    } catch (error) {
+        showToast('❌ Order was paid but failed to save on server. Please contact support.');
+        console.error('Order save error:', error);
+        return;
     }
 
     // Clear cart
@@ -315,6 +332,8 @@ function handlePaymentSuccess(response) {
     updateCartBadge();
 
     // Update success overlay
+    const oidEl = document.getElementById('success-order-id');
+    if (oidEl) oidEl.textContent = 'Order ID: ' + (savedOrder.orderNumber || savedOrder._id || 'N/A');
     const pidEl = document.getElementById('success-payment-id');
     if (pidEl) pidEl.textContent = 'Payment ID: ' + paymentId;
 

@@ -5,7 +5,10 @@ const orderItemSchema = new mongoose.Schema(
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Product',
-      required: true,
+      required: false,
+    },
+    storefrontProductId: {
+      type: Number,
     },
     title: {
       type: String,
@@ -24,6 +27,10 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+    size: {
+      type: String,
+      default: 'N/A',
+    },
   },
   { _id: false }
 );
@@ -34,6 +41,12 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    orderNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
     },
     items: {
       type: [orderItemSchema],
@@ -47,6 +60,10 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: 'mock',
     },
+    paymentId: {
+      type: String,
+      default: '',
+    },
     paymentStatus: {
       type: String,
       enum: ['pending', 'paid', 'failed'],
@@ -56,6 +73,12 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ['processing', 'shipped', 'delivered', 'cancelled'],
       default: 'processing',
+    },
+    statusTimeline: {
+      processingAt: Date,
+      shippedAt: Date,
+      deliveredAt: Date,
+      cancelledAt: Date,
     },
     itemsPrice: {
       type: Number,
